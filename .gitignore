@@ -1,0 +1,6 @@
+*.lst
+*.BIN
+*.fd
+tools/fdfs
+tools/c6809
+tools/*.exe
