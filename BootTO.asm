@@ -4,9 +4,10 @@
 
 * Must be used with a floppy created by fdfs
 * Track 20 Sector 1 contains the name of the floppy, fdfs adds:
-* - Address where to load file at position 12 & 13
-* - Track + sector min + sector max at next positions
+* - Address where to load file at position 12 & 13 (2 bytes)
+* - Track + sector min + sector max at next positions (3 bytes)
 * - 0xff end of file to load
+* - Address where to exec loaded file at next positions (2 bytes)
 
 
 (main)BootTO.asm

@@ -2,7 +2,7 @@
 
     org $6600
 
-PUTC    equ $E803   * Affichage d'un caractï¿½re
+PUTC    equ $E803   * Affichage d'un caractère
 
     leax STR_INTRO,PCR
 Intro_putc
@@ -23,7 +23,7 @@ Wait2
 
     rts
 
-STR_INTRO FCB $0D       * retour en dï¿½but de ligne courante
+STR_INTRO FCB $0D       * retour en début de ligne courante
           FCB $0A       * descente d'une ligne
           FCS "Introduction"
 
