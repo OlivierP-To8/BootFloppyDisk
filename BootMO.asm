@@ -52,7 +52,6 @@ DKBOOT  equ $28     * Lancement du boot
     * read sectors until FileEnd
     ldx Buffer_+12      * X = address where to load file
 Boot_file
-    pshs x
     leax -5,x           * starts 5 bytes before address to ignore bin header
 
 Boot_track
@@ -70,11 +69,11 @@ Boot_loop
     bra Boot_loop
 
 Boot_exec
-    puls x              * X = address where to exec file
+    leay -1,y           * Y points to exec address
+    ldx ,y++            * X = address where to exec file
     pshs y
     jsr ,x              * exec loaded file
     puls y
-    leay -1,y           * Y points address where to load next file
     ldx ,y+             * X = address where to exec file
     cmpx #$ffff
     bne Boot_file

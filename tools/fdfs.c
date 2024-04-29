@@ -186,7 +186,8 @@ int addFileEntry(char *filename, byte block, int sizeLeft)
 			3: fichier de texte*/
 	ThomsonFileType fileType = BASIC_PRG;
 	if ((strcmp(extension, ".BIN") == 0) ||
-		(strcmp(extension, ".CHG") == 0))
+		(strcmp(extension, ".CHG") == 0) ||
+		(strcmp(extension, ".MAP") == 0))
 	{
 		fileType = ASM_PRG;
 	}
@@ -355,6 +356,7 @@ void addBootLoader(char *bootsector, int nbf)
 			floppyDisk[20*trackSize+n++] = (byte)(fileAddr & 0xff);
 
 			byte nextb = freeBlock;
+			int src;
 			while (block != freeBlock)
 			{
 				nextb = floppyDisk[FAT+block];
@@ -363,6 +365,8 @@ void addBootLoader(char *bootsector, int nbf)
 				{
 					nbs = nextb - 0xc0;
 					nextb = freeBlock;
+					int nbBytes = (floppyDisk[REP+entry+14] << 8) | floppyDisk[REP+entry+15];
+					src = block*blockSize+(nbs-1)*sectorSize+nbBytes;
 				}
 				byte track = (block >> 1);
 				byte sector = (block & 0x01) ? 9 : 1;
@@ -372,6 +376,8 @@ void addBootLoader(char *bootsector, int nbf)
 				block = nextb;
 			}
 			floppyDisk[20*trackSize+n++] = freeBlock;
+			floppyDisk[20*trackSize+n++] = floppyDisk[src-2];
+			floppyDisk[20*trackSize+n++] = floppyDisk[src-1];
 		}
 	}
 }
@@ -464,9 +470,11 @@ void list(FILE *f)
 void addFile(char *filename)
 {
 	char *fileaddr = strstr(filename, ".BIN@");
+	char *fileexec = NULL;
 	if (fileaddr != NULL)
 	{
 		fileaddr[4] = 0;
+		fileexec = strstr(fileaddr+5, "@");
 	}
 	FILE *fi=fopen(filename, "rb");
 	if (fi==NULL)
@@ -507,13 +515,18 @@ void addFile(char *filename)
 		if ((delta>0) && (fileaddr!=NULL))
 		{
 			int sizecont = size-10;
-			int addrexec = (int)strtol(&fileaddr[5], NULL, 16);
-			printf("Ajout du header et footer au fichier %s @ %04x\n", filename, addrexec);
+			int addrload = (int)strtol(&fileaddr[5], NULL, 16);
+			int addrexec = addrload;
+			if (fileexec != NULL)
+			{
+				addrexec = (int)strtol(&fileexec[1], NULL, 16);
+			}
+			printf("Ajout du header et footer au fichier %s @ %04x %04x\n", filename, addrload, addrexec);
 			fileData[0] = 0x00;
 			fileData[1] = (byte)(sizecont >> 8);
 			fileData[2] = (byte)(sizecont & 0xff);
-			fileData[3] = (byte)(addrexec >> 8);
-			fileData[4] = (byte)(addrexec & 0xff);
+			fileData[3] = (byte)(addrload >> 8);
+			fileData[4] = (byte)(addrload & 0xff);
 			fileData[size-5] = 0xff;
 			fileData[size-4] = 0x00;
 			fileData[size-3] = 0x00;
