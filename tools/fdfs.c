@@ -341,7 +341,7 @@ void addBootLoader(char *bootsector, int nbf)
 			byte block = floppyDisk[REP+entry+13];
 			byte header[5];
 			memcpy(header, &floppyDisk[block*blockSize], 5);
-			unsigned int fileAddr, fileSize, fileEnd;
+			unsigned int fileAddr, fileSize, fileEnd, fileExec;
 
 			fileSize = header[1];
 			fileSize = (fileSize << 8) + header[2];
@@ -349,7 +349,7 @@ void addBootLoader(char *bootsector, int nbf)
 			fileAddr = (fileAddr << 8) + header[4];
 			fileEnd = fileAddr + fileSize;
 
-			printf("header: [%04x-%04x] (%d octets)\n", fileAddr, fileEnd, fileSize);
+			printf("header: [%04x-%04x] (%d octets)", fileAddr, fileEnd, fileSize);
 
 			// les infos permettant de lire le bootfile sont placées sur le secteur 20 piste 1
 			floppyDisk[20*trackSize+n++] = (byte)(fileAddr >> 8);
@@ -367,6 +367,16 @@ void addBootLoader(char *bootsector, int nbf)
 					nextb = freeBlock;
 					int nbBytes = (floppyDisk[REP+entry+14] << 8) | floppyDisk[REP+entry+15];
 					src = block*blockSize+(nbs-1)*sectorSize+nbBytes;
+					if (nbBytes < 2)
+					{	// l'adresse est coupée entre 2 secteurs, il faut tenir compte du 256e octet non géré
+						fileExec = floppyDisk[src-3];
+					}
+					else
+					{
+						fileExec = floppyDisk[src-2];
+					}
+					fileExec = (fileExec << 8) + floppyDisk[src-1];
+					printf(" exec %04x\n", fileExec);
 				}
 				byte track = (block >> 1);
 				byte sector = (block & 0x01) ? 9 : 1;
@@ -376,8 +386,8 @@ void addBootLoader(char *bootsector, int nbf)
 				block = nextb;
 			}
 			floppyDisk[20*trackSize+n++] = freeBlock;
-			floppyDisk[20*trackSize+n++] = floppyDisk[src-2];
-			floppyDisk[20*trackSize+n++] = floppyDisk[src-1];
+			floppyDisk[20*trackSize+n++] = (byte)(fileExec >> 8);
+			floppyDisk[20*trackSize+n++] = (byte)(fileExec & 0xff);
 		}
 	}
 }
@@ -521,7 +531,7 @@ void addFile(char *filename)
 			{
 				addrexec = (int)strtol(&fileexec[1], NULL, 16);
 			}
-			printf("Ajout du header et footer au fichier %s @ %04x %04x\n", filename, addrload, addrexec);
+			printf("Ajout du header et footer au fichier %s @ load %04x exec %04x\n", filename, addrload, addrexec);
 			fileData[0] = 0x00;
 			fileData[1] = (byte)(sizecont >> 8);
 			fileData[2] = (byte)(sizecont & 0xff);
