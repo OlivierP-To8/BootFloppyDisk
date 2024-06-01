@@ -26,7 +26,7 @@ Wait2
 
 STR_DEMO  FCB $0D       * retour en début de ligne courante
           FCB $0A       * descente d'une ligne
-          FCS "DEMO"
+          FCS "Running on MO"
 
     end $2600
 
