@@ -20,14 +20,14 @@
 
 Buffer_ equ $6300
 
-DKOPC   equ $6048   * Commande du contrôleur de disque
-DKDRV   equ $6049   * Numéro du disque (0 à 3)
-DKTRK   equ $604B   * Numéro de piste (0 à 39 ou 79)
-DKSEC   equ $604C   * Numéro de secteur (1 à 16)
-DKSTA   equ $604E   * Etat du contrôleur de disquettes
+DKOPC   equ $6048   * Commande du contrÃ´leur de disque
+DKDRV   equ $6049   * NumÃ©ro du disque (0 Ã  3)
+DKTRK   equ $604B   * NumÃ©ro de piste (0 Ã  39 ou 79)
+DKSEC   equ $604C   * NumÃ©ro de secteur (1 Ã  16)
+DKSTA   equ $604E   * Etat du contrÃ´leur de disquettes
 DKBUF   equ $604F   * Pointeur de la zone tampon d'I/O disque (256 octets max)
-TSTRST  equ $60FE   * Sémaphore de demarrage à chaud ou à froid
-DKCO    equ $E82A   * Contrôleur de disque
+TSTRST  equ $60FE   * SÃ©maphore de demarrage Ã  chaud ou Ã  froid
+DKCO    equ $E82A   * ContrÃ´leur de disque
 MENU    equ $E82D   * Retour au menu principal
 
     SETDP $60

@@ -1,0 +1,151 @@
+#
+#  Shared makefile for building C6809. Requires mingwXX-make.
+#
+#  Available options:
+#
+#     Environment variables:
+#        DEBUGMODE=1       selects a debug build.
+#        ENGLISH=1         compile english version
+#
+#     Targets: 
+#        default:          build c6809
+#        all:              build c6809
+#        clean:            remove objects and executable files.
+#        veryclean:        remove all generated files.
+#        depend:           regenerate the dependency files.
+#
+#  The "clean" and "veryclean" targets require a Unix-style rm command
+#  to be installed, eg. from the djgpp fileutils package.
+#
+#  The "depend" target requires long command line support and the stream
+#  editor sed to be installed. 
+
+
+.PHONY: _default
+
+_default: default
+
+
+# ------ sources files ------
+
+C6809_SRC_FILES = \
+    src/instruct/bra.c      \
+    src/instruct/inherent.c \
+    src/instruct/immediat.c \
+    src/instruct/indexed.c  \
+    src/instruct/lbra.c     \
+    src/instruct/pushpull.c \
+    src/instruct/tfrexg.c   \
+    src/directiv/macro.c    \
+    src/directiv/end.c      \
+    src/directiv/if.c       \
+    src/directiv/opt.c      \
+    src/directiv/org.c      \
+    src/directiv/page.c     \
+    src/directiv/print.c    \
+    src/directiv/rmx.c      \
+    src/directiv/setdp.c    \
+    src/directiv/title.c    \
+    src/directiv/fcx.c      \
+    src/directiv/includ.c   \
+    src/directiv/setequ.c   \
+    src/directiv/blank.c    \
+    src/directiv/comment.c  \
+    src/directiv/mo.c       \
+    src/output/asm.c      \
+    src/output/bin.c      \
+    src/output/console.c  \
+    src/output/html.c     \
+    src/output/lst.c      \
+    src/output/thomson.c  \
+    src/encode.c    \
+    src/source.c    \
+    src/arg.c       \
+    src/symbol.c    \
+    src/eval.c      \
+    src/mark.c      \
+    src/assemble.c  \
+    src/error.c     \
+    src/output.c    \
+    src/option.c
+
+C6809_LINUX_FILES = \
+    src/linux/umain.c
+
+C6809_WIN_FILES = \
+    src/win/wmain.c
+
+# ------ compiler flags ------ 
+
+CC = gcc
+
+WFLAGS = -Wall
+
+ifdef PGCC
+   OFLAGS = -O6 -ffast-math
+else
+ifdef PENTIUMONLY
+   OFLAGS = -march=pentium -O2 -funroll-loops -ffast-math
+else
+   OFLAGS = -O2 -funroll-loops -ffast-math
+endif
+endif
+
+# ------ object files ------
+
+VPATH = src src/instruct src/directiv src/output
+
+COMMON_OBJ_LIST = $(basename $(notdir $(C6809_SRC_FILES)))
+
+include $(MAKEFILE_INC)
+
+CFLAGS += -fsigned-char
+
+ifdef UNIX_TOOLS
+CFLAGS += -DUNIX_TOOL
+endif
+
+OBJ = $(addprefix $(OBJ_DIR)/, $(addsuffix .o , $(OBJ_LIST)))
+
+CLEAN_FILES = $(OBJ) $(EXE_NAME)
+
+
+$(OBJ_DIR)/%.o: %.c
+	$(CC) -c $(CFLAGS) -I./include -o $@ $< -MMD
+
+
+$(EXE_NAME): $(OBJ)
+	$(CC) $(LFLAGS) -o $(EXE_NAME) $(OBJ) $(LIB) -MMD
+
+
+# ------ target rules ------ 
+
+.PHONY: default install all clean veryclean depend
+
+default: $(EXE_NAME)
+	@echo The $(DESCRIPTION) $(PLATFORM) version has been compiled.
+
+all: $(EXE_NAME)
+
+clean:
+ifdef UNIX_TOOLS
+	rm -f $(CLEAN_FILES)
+else
+   define RM_FILES
+      $(foreach file, $(CLEAN_FILES), if exist $(subst /,\,$(file)) del $(subst /,\,$(file))
+      )
+   endef
+	-$(RM_FILES)
+endif
+
+veryclean: clean
+ifdef UNIX_TOOLS
+	rm -f $(OBJ_DIR)/makefile.dep
+else
+	-if exist $(subst /,\,$(OBJ_DIR)/makefile.dep) del $(subst /,\,$(OBJ_DIR)/makefile.dep)
+endif
+
+
+# ------ automatic source dependencies ------
+
+-include $(OBJ_DIR)/makefile.dep

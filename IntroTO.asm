@@ -2,7 +2,7 @@
 
     org $6600
 
-PUTC    equ $E803   * Affichage d'un caractère
+PUTC    equ $E803   * Affichage d'un caractÃ¨re
 
     leax STR_INTRO,PCR
 Intro_putc
@@ -23,11 +23,11 @@ Wait2
 
     rts
 
-STR_INTRO FCB $14          * effacer le curseur de l'écran
+STR_INTRO FCB $14          * effacer le curseur de l'Ã©cran
           FCB $1B,$47      * couleur forme blanc
           FCB $1B,$50      * couleur fond  noir
           FCB $1B,$60      * couleur tour  noir
-          FCB $0C          * effacement de la fenêtre
+          FCB $0C          * effacement de la fenÃªtre
           FCB $1F,$40,$40  * positionnement du curseur
           FCB $0D          * retour en debut de ligne courante
           FCS "Fire effect ported by OlivierP-To8"

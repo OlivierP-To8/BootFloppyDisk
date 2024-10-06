@@ -18,7 +18,7 @@ BUFW    equ 10
 
 
 ********************************************************************************
-* Effacement ecran
+* Effacement écran
 ********************************************************************************
 DEBUT
     * commutation du bit de couleur (C0 a 0)
@@ -96,7 +96,7 @@ INITTO
 
 
 ********************************************************************************
-* Effacement de l'ecran
+* Effacement de l'écran
 ********************************************************************************
 EFF
     LDY VRAM_DEB
@@ -108,7 +108,7 @@ EFF_RAM
 
 
 ********************************************************************************
-* Initialisation du buffer avec une ligne blanche en bas de l'ecran
+* Initialisation du buffer avec une ligne blanche en bas de l'écran
 ********************************************************************************
 BUFFER_DEBUT
     LDD FEU_LEVELMO   * noir
@@ -152,7 +152,7 @@ FEU_NEXT
     BLO FEU_LIGNE
 
     * le calcul est fait dans un buffer de 10 colonnes
-    * l'affichage est repete 4 fois (pour les 40 octets par ligne)
+    * l'affichage est répété 4 fois (pour les 40 octets par ligne)
     LDU #BUFFER+BUFW
     LDX #$1F40-(BUFFER_FIN-BUFFER)*(40/BUFW)
     LDY #FEU_LEVELMO

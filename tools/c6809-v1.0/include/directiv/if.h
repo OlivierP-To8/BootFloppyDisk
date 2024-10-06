@@ -1,0 +1,39 @@
+/*
+ *  c6809 version 1.0.0
+ *  copyright (c) 2024 François Mouret
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+#ifndef C6809_IF_H
+#define C6809_IF_H 1
+
+extern void  if_AssembleIF (void);
+extern void  if_AssembleIFNE (void);
+extern void  if_AssembleIFEQ (void);
+extern void  if_AssembleIFGT (void);
+extern void  if_AssembleIFLT (void);
+extern void  if_AssembleIFGE (void);
+extern void  if_AssembleIFLE (void);
+extern void  if_AssembleELSE (void);
+extern void  if_AssembleENDC (void);
+extern void  if_AssembleENDIF (void);
+extern void  if_EndError (void);
+extern int   if_GetLevel (void);
+extern void  if_Init (void);
+extern void  if_Close (void);
+
+#endif
+

@@ -1,6 +1,7 @@
 all: fdfs c6809
 
 clean:
+	make -C c6809-v1.0 clean
 	-rm fdfs c6809
 
 fdfs: fdfs.c
@@ -9,9 +10,7 @@ fdfs: fdfs.c
 fdfs.exe: fdfs.c
 	i686-w64-mingw32-gcc -o $@ fdfs.c
 
-c6809: c6809.c
-	gcc -o $@ $@.c
-
-c6809.exe: c6809.c
-	i686-w64-mingw32-gcc -o $@ c6809.c
+c6809:
+	make -C c6809-v1.0 all
+	cp c6809-v1.0/c6809 .
 

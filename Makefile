@@ -7,9 +7,9 @@ clean:
 fdfs: tools/fdfs
 	make -C tools fdfs
 
-c6809: tools/c6809
-	make -C tools c6809
-
+tools/c6809:
+	make -C tools/c6809-v1.0
+	cp tools/c6809-v1.0/c6809 tools/c6809
 
 BOOTMO.BIN: tools/c6809 BootMO.asm
 	tools/c6809 -bl BootMO.asm $@

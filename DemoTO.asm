@@ -2,7 +2,7 @@
 
     org $6600
 
-PUTC    equ $E803   * Affichage d'un caractère
+PUTC    equ $E803   * Affichage d'un caractÃ¨re
 
     leax STR_DEMO,PCR
 Demo_putc
@@ -23,7 +23,7 @@ Wait2
 
     rts
 
-STR_DEMO  FCB $0D       * retour en début de ligne courante
+STR_DEMO  FCB $0D       * retour en dÃ©but de ligne courante
           FCB $0A       * descente d'une ligne
           FCS "Running on TO"
 

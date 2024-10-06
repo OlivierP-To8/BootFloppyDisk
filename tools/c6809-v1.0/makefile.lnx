@@ -1,0 +1,42 @@
+#
+#  Rules for building Megarom with Linux. This file is included
+#  by the primary makefile, and should not be used directly.
+#
+#  The "depend" target uses sed.
+#
+#  See makefile.all for a list of the available targets.
+
+
+UNIX_TOOLS = 1
+
+
+# ------ compiler flags ------ 
+
+CFLAGS = -g $(WFLAGS)
+LFLAGS = -g
+DESCRIPTION = standard
+
+ifdef DEBUGMODE
+CFLAGS += -DDEBUG
+endif
+
+# ------ plateform-dependant objects and executables ------
+
+PLATFORM = linux
+EXE_NAME = c6809
+OBJ_DIR = obj/linux
+CFLAGS += -DOS_LINUX -ftree-vectorize
+
+VPATH += src/linux
+
+OBJ_LIST = $(COMMON_OBJ_LIST) $(basename $(notdir $(C6809_LINUX_FILES)))
+
+# ------ dependency generation -------
+
+DEPEND_PARAMS = -MM -MG -DSCAN_DEPEND -I./include
+
+depend:
+	$(CC) $(DEPEND_PARAMS) src/*.c src/instruct/*.c src/directiv/*.c > _depend.tmp
+	sed -e "s/^[a-zA-Z0-9_\/]*\///" _depend.tmp > _depend2.tmp
+	sed -e "s/^\([a-zA-Z0-9_]*\.o:\)/obj\/linux\/\1/" _depend2.tmp > obj/linux/makefile.dep
+	rm _depend.tmp _depend2.tmp

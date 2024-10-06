@@ -24,14 +24,14 @@
 
 Buffer_ equ $6300
 
-DKOPC   equ $6048   * Commande du controleur de disque
-DKDRV   equ $6049   * Numero du disque (0 a 3)
-DKTRK   equ $604B   * Numero de piste (0 a 39 ou 79)
-DKSEC   equ $604C   * Numero de secteur (1 a 16)
-DKSTA   equ $604E   * Etat du controleur de disquettes
+DKOPC   equ $6048   * Commande du contrôleur de disque
+DKDRV   equ $6049   * Numéro du disque (0 à 3)
+DKTRK   equ $604B   * Numéro de piste (0 à 39 ou 79)
+DKSEC   equ $604C   * Numéro de secteur (1 à 16)
+DKSTA   equ $604E   * Etat du contrôleur de disquettes
 DKBUF   equ $604F   * Pointeur de la zone tampon d'I/O disque (256 octets max)
-STACK   equ $60CC   * Pile systeme
-DKCO    equ $E82A   * Controleur de disque
+STACK   equ $60CC   * Pile système
+DKCO    equ $E82A   * Contrôleur de disque
 
     lda $FFF2           * Test if MO ($F0) or TO ($70)
     bge BOOT
