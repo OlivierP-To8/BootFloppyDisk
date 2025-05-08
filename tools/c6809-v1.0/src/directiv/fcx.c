@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -292,7 +292,7 @@ static void write_fcc (void)
 static void write_fxb (void)
 {
     int code = ARG_ALPHA;  /* Valeur arbitraire != ARG_END */
-    int value = 0;
+    u16 value = 0;
 
     assemble_Label (SYMBOL_TYPE_LABEL, org_Get());
 
@@ -305,7 +305,7 @@ static void write_fxb (void)
             {
                 case OUTPUT_CODE_BYTES:
                 case OUTPUT_CODE_BYTES_ONLY:
-                    if ((value < -256) || (value > 255))
+                    if ((value > 0xff) && (value < 0xff00))
                     {
                         (void)error_OperandOutOfRange ();
                     }
@@ -314,7 +314,7 @@ static void write_fxb (void)
 
                 case OUTPUT_CODE_WORDS:
                 case OUTPUT_CODE_WORDS_ONLY:
-                    write_fcx ((char)((uint)value >> 8));
+                    write_fcx ((char)(value/256));
                     write_fcx ((char)value);
                     break;
             }

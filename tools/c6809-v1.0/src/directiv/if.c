@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -68,8 +68,8 @@ int if_level = 0;
  */
 static void error_multiple_definition (void)
 {
-    (void)error_Error ((is_fr) ? "{Cc@%d}définition multiple"
-                               : "{Cc@%d}multiple definition", if_line);
+    (void)error_Error ((is_fr) ? "{C}{c}{@%d}définition multiple"
+                               : "{C}{c}{@%d}multiple definition", if_line);
 }
 
 
@@ -119,8 +119,9 @@ static void add_if (int status)
         if ((if_level == (IF_LEVEL_MAX+1))
          && (assemble.soft == ASSEMBLER_MACRO))
         {
-            error_Assembler ((is_fr)?"{Cc}%d imbrications maximum"
-                                    :"{Cc}%d embedding maximum", IF_LEVEL_MAX);
+            error_Assembler ((is_fr)?"{C}{c}%d imbrications maximum"
+                                    :"{C}{c}%d embedding maximum",
+                                     IF_LEVEL_MAX);
         }
 
         if_list->next = if_list_old;
@@ -173,7 +174,7 @@ static void free_if (void)
 static void assemble_if (int type)
 {
     int err;
-    int value = 0;
+    u16 value = 0;
     int status = IF_STOP;
 
     if ((assemble.lock & ASSEMBLE_LOCK_IF) == 0)
@@ -187,10 +188,10 @@ static void assemble_if (int type)
                 status =
                     (type == IF_IFNE) ? (value != 0) ? IF_TRUE : IF_FALSE :
                     (type == IF_IFEQ) ? (value == 0) ? IF_TRUE : IF_FALSE :
-                    (type == IF_IFGT) ? (value >  0) ? IF_TRUE : IF_FALSE :
-                    (type == IF_IFLT) ? (value <  0) ? IF_TRUE : IF_FALSE :
-                    (type == IF_IFGE) ? (value >= 0) ? IF_TRUE : IF_FALSE :
-                    (type == IF_IFLE) ? (value <= 0) ? IF_TRUE : IF_FALSE :
+                    (type == IF_IFGT) ? ((int)value >  0) ? IF_TRUE : IF_FALSE :
+                    (type == IF_IFLT) ? ((int)value <  0) ? IF_TRUE : IF_FALSE :
+                    (type == IF_IFGE) ? ((int)value >= 0) ? IF_TRUE : IF_FALSE :
+                    (type == IF_IFLE) ? ((int)value <= 0) ? IF_TRUE : IF_FALSE :
                      IF_STOP;
             }
             else

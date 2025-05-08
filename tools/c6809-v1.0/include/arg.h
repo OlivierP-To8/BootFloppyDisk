@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ struct ARG_LIST {
     int    style;      /* Style de l'argument */
     int    error;      /* Error sur l'argument */
     int    column;     /* Colonne de l'argument */
-    int    value;      /* Valeur de l'argument */
+    u16    value;      /* Valeur de l'argument */
     struct ARG_LIST /*@only@*//*@null@*/*next;  /* Argument suivant */
 };
 
@@ -110,7 +110,7 @@ struct ARG_STRUCT {
     int    style;      /* Style de l'argument courant */
     int    error;      /* Erreur sur l'argument courant */
     int    column;     /* Colonne de l'argument courant */
-    int    value;      /* Valeur de l'argument courant */
+    u16    value;      /* Valeur de l'argument courant */
     int    size;       /* Taille de l'argument courant */
     struct ARG_LIST /*@only@*//*@null@*/*list;  /* Liste des arguments */
 };
@@ -148,7 +148,7 @@ extern int   arg_OffsetError (void);
 extern int   arg_AddressingError (void);
 extern int   arg_Error (void);
 extern int   arg_DivisionError (void);
-extern void  arg_SetCommandStyle (int style, int value);
+extern void  arg_SetCommandStyle (int style, u16 value);
 extern void  arg_SetLabelStyle (int style);
 
 extern void  arg_SetStyle (int style);

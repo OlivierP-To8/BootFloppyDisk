@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
  */
 void bra_Assemble (void)
 {
-    int value = 0;
+    u16 value = 0;
 
     output_SetCode (OUTPUT_CODE_2_FOR_2);
     bin.buf[2] = '\xfe';
@@ -46,10 +46,10 @@ void bra_Assemble (void)
     if (eval_Do (&assemble.ptr, &value) == 0)
     {
         value -= org_Get() + 2;
-        if ((value < -0x80) || (value > 0x7f))
+        if ((value > 0x7f) && (value < 0xff80))
         {
-            (void)error_Error ((is_fr)?"{Co}branchement hors champ"
-                                      :"{Co}branch out of range");
+            (void)error_Error ((is_fr)?"{C}{o}branchement hors champ"
+                                      :"{C}{o}branch out of range");
         }
         else
         {

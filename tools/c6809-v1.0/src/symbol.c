@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -465,7 +465,7 @@ void symbol_Close (void)
  *   2. Met éventuellement le symbole à jour
  *   3. Renvoie le pointeur de symbole
  */
-struct SYMBOL_LIST *symbol_Do (char *name, int value, int type)
+struct SYMBOL_LIST *symbol_Do (char *name, u16 value, int type)
 {
     struct SYMBOL_LIST *symbol;
     int symbol_changed = 0;
@@ -480,6 +480,12 @@ struct SYMBOL_LIST *symbol_Do (char *name, int value, int type)
             {
                 symbol->prm->times++;
             }
+            
+            if (symbol->prm->type == SYMBOL_TYPE_ARG)
+            {
+                symbol->prm->pass = assemble.pass;
+            }
+                
             symbol_activated |= (symbol->prm->pass == assemble.pass) ? 0 : 1;
         }
         else  /* écriture */

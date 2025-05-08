@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -272,7 +272,6 @@ static char *set_text (char /*@returned@*/*in, char *out)
 {
     int i;
 
-    in += 1;
     for (i = 0; (*in != '}') && (*in != '\0'); i++)
     {
          out[i] = *(in++);
@@ -307,31 +306,26 @@ static void set_error (int type, char *name, const char *format, va_list *args)
 
         (void)vsnprintf (str, MAX_STRING, format, *args);
         p = str;
-        if (*p == '{')
+        while (*p == '{')
         {
-            p += 1;
-            while ((*p != '}') && (*p != '\0'))
+            switch (*(++p))
             {
-                switch (*p)
-                {
-                    case '@': p = set_text (p, error_arg); break;
-                    case '>': p = set_text (p, error_file); break;
-                    case 'C': set_known (assemble.command,error_command);break;
-                    case 'L': set_known (assemble.label, error_label); break;
-
-                    case '+': column = arg_Error (); break;
-                    case 'c': column = arg_CommandError (); break;
-                    case 'l': column = arg_LabelError (); break;
-                    case 'o': column = arg_OperandError (); break;
-                    case '[': column = arg_BracketError (); break;
-                    case 'p': column = arg_ParenthesisError (); break;
-                    case '/': column = arg_DivisionError (); break;
-                    case 'f': column = arg_OffsetError (); break;
-                    case 'a': column = arg_AddressingError (); break;
-                    default : column = arg.column; break;
-                }
-                p += ((*p == '}') || (*p == '\0')) ? 0 : 1;
+                case '@': p = set_text (p+1, error_arg); break;
+                case '>': p = set_text (p+1, error_file); break;
+                case 'C': set_known (assemble.command,error_command); break;
+                case 'L': set_known (assemble.label, error_label); break;
+                case '+': column = arg_Error (); break;
+                case 'c': column = arg_CommandError (); break;
+                case 'l': column = arg_LabelError (); break;
+                case 'o': column = arg_OperandError (); break;
+                case '[': column = arg_BracketError (); break;
+                case 'p': column = arg_ParenthesisError (); break;
+                case '/': column = arg_DivisionError (); break;
+                case 'f': column = arg_OffsetError (); break;
+                case 'a': column = arg_AddressingError (); break;
+                default : column = arg.column; break;
             }
+            p += (*p != '\0') ? 1 : 0;
             p += (*p == '}') ? 1 : 0;
         }
 
@@ -555,6 +549,15 @@ int error_ErrnoFOpen (char *name)
 #ifndef S_SPLINT_S
     switch (errno)
     {
+        case ENOTDIR: (void)error_Fatal ((is_fr)
+                     ? "{>%s}N'est pas un dossier"
+                     : "{>%s}Not a directory", name); break;
+        case ENFILE: (void)error_Fatal ((is_fr)
+                     ? "{>%s}Trop de fichiers ouverts dans le système"
+                     : "{>%s}Too many open files in system", name); break;
+        case ENAMETOOLONG: (void)error_Fatal ((is_fr)
+                     ? "{>%s}Nom de fichier trop long"
+                     : "{>%s}Filename too long", name); break;
         case ENOENT: (void)error_Fatal ((is_fr)
                      ? "{>%s}fichier ou répertoire introuvable"
                      : "{>%s}no such file or directory", name); break;
@@ -592,8 +595,8 @@ void error_DirectiveNotSupported (int flag)
 {
     if (flag == 1)
     {
-        error_Assembler ((is_fr) ? "{Cc}directive non supportée"
-                                 : "{Cc}directive not supported");
+        error_Assembler ((is_fr) ? "{C}{c}directive non supportée"
+                                 : "{C}{c}directive not supported");
     }
 }
 
@@ -606,8 +609,8 @@ void error_LabelNotSupported (void)
 {
     if (assemble.label[0] != '\0')
     {
-        error_Warning ((is_fr) ? "{Ll}étiquette non supportée"
-                               : "{Ll}label not supported");
+        error_Warning ((is_fr) ? "{L}{l}étiquette non supportée"
+                               : "{L}{l}label not supported");
     }
 }
 
@@ -629,8 +632,8 @@ int error_BadAddressingMode (void)
  */
 int error_OperandOutOfRange (void)
 {
-    return error_Error ((is_fr) ? "{Co}opérande hors champ"
-                                : "{Co}operand out of range");
+    return error_Error ((is_fr) ? "{C}{o}opérande hors champ"
+                                : "{C}{o}operand out of range");
 }
 
 

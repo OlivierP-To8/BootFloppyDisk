@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include "arg.h"
 #include "directiv/end.h"
 
-static int end_exec = 0;
+static u16 end_exec = 0;
 static int end_done = 0;
 
 
@@ -67,9 +67,9 @@ int end_IsEnd (void)
 /* end_GetExec:
  *  Retourne l'adresse d'exécution.
  */
-int end_GetExec (void)
+u16 end_GetExec (void)
 {
-    return end_exec & 0xffff;
+    return end_exec;
 }
 
 

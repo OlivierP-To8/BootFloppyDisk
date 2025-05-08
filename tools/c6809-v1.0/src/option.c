@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -238,8 +238,7 @@ static void option_version (void)
          PROG_VERSION_MINOR,
          PROG_VERSION_MICRO);
     print_con ("Copyright (c) %s %s François Mouret\n",
-         (is_fr)?PROG_CREATION_MONTH_FR
-                :PROG_CREATION_MONTH_EN,
+         PROG_CREATION_MONTH,
          PROG_CREATION_YEAR);
     option_exit = 1;
 }
@@ -329,7 +328,7 @@ static void set_value (void)
 {
     int err = -1;
     char *str = NULL;
-    int value = 0;
+    u16 value = 0;
 
     if (++arg_i < arg_c)
     {
@@ -343,9 +342,7 @@ static void set_value (void)
              && (*arg.str == '=')
              && (eval_Do (&assemble.ptr, &value) == 0))
             {
-                assemble.pass = ASSEMBLE_PASS1;
                 (void)symbol_Do (assemble.label, value, SYMBOL_TYPE_ARG);
-                assemble.pass = ASSEMBLE_SCAN;
                 err = 0;
             }
         }

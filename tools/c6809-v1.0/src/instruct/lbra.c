@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,20 +38,20 @@
  */
 void lbra_Assemble (void)
 {
-    int value = 0;
+    u16 value = 0;
 
     output_SetCode (OUTPUT_CODE_2_FOR_3);
 
     (void)eval_Do (&assemble.ptr, &value);
     value -= org_Get() + bin.size + ((bin.buf[0] != '\0') ? 1 : 0);
 
-    if ((value >= -0x80) && (value <= 0x7f))
+    if ((value >= 0xff80) || (value <= 0x7f))
     {
-        (void)error_Optimize ((is_fr)?"{Co}branchement court possible"
-                                     :"{Co}could be short branch");
+        (void)error_Optimize ((is_fr)?"{C}{o}branchement court possible"
+                                     :"{C}{o}could be short branch");
     }
 
-    bin.buf[2] = (char)((uint)value >> 8);
+    bin.buf[2] = (char)(value / 256);
     bin.buf[3] = (char)value;
 }
 

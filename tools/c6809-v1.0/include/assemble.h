@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ extern struct ASSEMBLE_STRUCT assemble;
 
 extern void assemble_Init (void);
 extern void assemble_Do (char *file_ass, char *file_bin);
-extern void assemble_Label (int value, int type);
+extern void assemble_Label (int type, u16 value);
 extern void assemble_Flush (int style);
 extern int  assemble_CheckEnd (void);
 extern int  assemble_HasOperand (char *name);

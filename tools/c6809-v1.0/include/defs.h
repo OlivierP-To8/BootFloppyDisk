@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,8 +21,13 @@
 #ifndef C6809_DEFS_H
 #define C6809_DEFS_H 1
 
-#ifndef NULL
-#   define NULL 0
+#ifndef SCAN_DEPEND
+    #ifndef bool
+        #include <stdbool.h>
+    #endif
+    #ifndef NULL
+        #include <stddef.h>
+    #endif
 #endif
 
 #ifndef MIN
@@ -35,17 +40,13 @@
 
 #define PROG_VERSION_MAJOR "1"
 #define PROG_VERSION_MINOR "0"
-#define PROG_VERSION_MICRO "0"
-#define PROG_CREATION_YEAR "2024"
-#define PROG_CREATION_MONTH_EN "September"
-#define PROG_CREATION_MONTH_FR "août"
+#define PROG_VERSION_MICRO "3"
+#define PROG_CREATION_YEAR "2025"
+#define PROG_CREATION_MONTH "March"
 
 typedef unsigned char uchar;
 typedef unsigned int  uint;
-#ifndef bool
-#include <stdbool.h>
-#endif
-
+typedef unsigned short u16;
 
 #define SIGNED(a)   (0-((a)&0x8000)+((a)&0x7fff))
 

@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ enum {
 struct EVAL_LIST {
     int    sign;
     int    precedence;
-    int    value;
+    u16    value;
     struct EVAL_LIST /*@only@*//*@null@*/*next;
 };
 
@@ -129,7 +129,7 @@ static int isoft[4] = {
     OPERATOR_I_C6809           /* SOFT_C6809 */
 };
 
-static int eval_value = 0;
+static u16 eval_value = 0;
 static int eval_sign = 0;
 static int eval_operator = 0;
 static int eval_precedence = PRECEDENCE_END;
@@ -187,7 +187,7 @@ static int error_bases_incompatible (void)
 /* push_eval:
  *  Ajoute un élément d'évaluation.
  */
-static int push_eval (int sign, int precedence, int value)
+static int push_eval (int sign, int precedence, u16 value)
 {
     int err = 0;
     struct EVAL_LIST *eval_list_old = eval_list;
@@ -299,7 +299,7 @@ static int read_numeric_value (int base0)
         {
             c -= (c < (int)'A') ? (int)'0' : (int)'A' - 10;
             err |= ((c < 0) || (c >= base0)) ? error_wrong_digit () : 0;
-            eval_value = eval_value * base0 + c;
+            eval_value = eval_value * (u16)base0 + (u16)c;
         }
         else
         {
@@ -330,10 +330,10 @@ static int read_numeric_value_with_base (void)
 
     switch (*peval)
     {
-        case '0': base = 16; break;
         case '@': base = 8;  arg_ReadChar (&peval, ARG_STYLE_VALUE); break;
         case '$': base = 16; arg_ReadChar (&peval, ARG_STYLE_VALUE); break;
         case '%': base = 2;  arg_ReadChar (&peval, ARG_STYLE_VALUE); break;
+        case '&': base = 10; arg_ReadChar (&peval, ARG_STYLE_VALUE); break;
     }
                   
     error_binary_not_supported (base);
@@ -394,7 +394,7 @@ static int read_alpha_value (void)
             err |= (c < '\0') ? error_BadCharacter () : 0;
         }
 
-        eval_value = (eval_value * 256) | ((int)c & 0xff);
+        eval_value = (eval_value * 256) | ((u16)c & 0xff);
     }
 
     arg_CaseOff ();
@@ -452,6 +452,7 @@ static int read_value (void)
 
     switch (*peval)
     {
+        case '0':
         case '1':
         case '2':
         case '3':
@@ -462,7 +463,6 @@ static int read_value (void)
         case '8':
         case '9':   err = read_numeric_value (base); break;
 
-        case '0':
         case '&':
         case '@':
         case '%':
@@ -625,8 +625,8 @@ static int read_sign (void)
 static int calculate (void)
 {
     int err = 0;
-    int v1;
-    int v2;
+    u16 v1;
+    u16 v2;
 
     if (eval_list != NULL)
     {
@@ -644,23 +644,23 @@ static int calculate (void)
             case SIGN_MINUS:  v1 = -v2; break;
             case SIGN_COM:    v1 = ~v2; break;
             case SIGN_PLUS:   v1 += v2; break;
-            case SIGN_NOT:    v1 = (int)(-v2 - 1); break;
-            case OPER_LE:     v1 = (int)((v1 <= v2) ? -1 : 0); break;
-            case OPER_EQUAL:  v1 = (int)((v1 == v2) ? -1 : 0); break;
-            case OPER_GT:     v1 = (int)((v1 > v2) ? -1 : 0); break;
-            case OPER_LESS:   v1 = (int)((v1 < v2) ? -1 : 0); break;
-            case OPER_OR2:    v1 = (int)(((v1 | v2) != 0) ? -1 : 0); break;
-            case OPER_GE:     v1 = (int)((v1 >= v2) ? -1 : 0); break;
-            case OPER_AND2:   v1 = (int)(((v1 & v2) != 0) ? -1 : 0); break;
-            case OPER_NE:     v1 = (int)(((v1 != v2) != 0) ? -1 : 0); break;
-            case OPER_RSHIFT: v1 = (int)(((uint)v1&0xffff)>>((uint)v2&0xffff));
+            case SIGN_NOT:    v1 = (u16)(-v2 - 1); break;
+            case OPER_LE:     v1 = (u16)((v1 <= v2) ? -1 : 0); break;
+            case OPER_EQUAL:  v1 = (u16)((v1 == v2) ? -1 : 0); break;
+            case OPER_GT:     v1 = (u16)((v1 > v2) ? -1 : 0); break;
+            case OPER_LESS:   v1 = (u16)((v1 < v2) ? -1 : 0); break;
+            case OPER_OR2:    v1 = (u16)(((v1 | v2) != 0) ? -1 : 0); break;
+            case OPER_GE:     v1 = (u16)((v1 >= v2) ? -1 : 0); break;
+            case OPER_AND2:   v1 = (u16)(((v1 & v2) != 0) ? -1 : 0); break;
+            case OPER_NE:     v1 = (u16)(((v1 != v2) != 0) ? -1 : 0); break;
+            case OPER_RSHIFT: v1 = (u16)(((uint)v1&0xffff)>>((uint)v2&0xffff));
                                     break;
             case OPER_DIV:    v1 /= (v2 == 0) ? 1 : v2; break;
             case OPER_MOD:    v1 %= (v2 == 0) ? 1 : v2; break;
             case OPER_LSHIFT:
-                v1 = ((eval_soft==0)&&(assemble.soft<ASSEMBLER_C6809)&&(v2<0))
-                    ? (int)(((uint)v1 & 0xffff) >> ((uint)(-v2) & 0xffff))
-                    : (int)(((uint)v1 & 0xffff) << ((uint)v2 & 0xffff));
+                v1 = ((eval_soft==0)&&(assemble.soft<ASSEMBLER_C6809)&&(v2>0x7fff))
+                    ? (u16)(v1 >> (u16)(-v2))
+                    : (u16)(v1 << v2);
                 break;
         }
 
@@ -812,14 +812,13 @@ static int operand_evaluation (void)
 /* eval_Do:
  *  Evaluation de l'opérande.
  */
-int eval_Do (char **p, int *value)
+int eval_Do (char **p, u16 *value)
 {
     int err;
 
     peval = *p;
     err = operand_evaluation ();
     *p = peval;
-    eval_value = 0 - (eval_value & 0x8000) + (eval_value & 0x7fff);
     *value = (err == 0) ? eval_value : 0;
 
     return err;

@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,8 +107,8 @@ static void display_source (void)
  */
 static int error_wrong_thomson_file (char *name)
 {
-    return error_Error ((is_fr) ? "{Cc}%s de fichier Thomson incorrect"
-                                : "{Cc}wrong Thomson file %s", name);
+    return error_Error ((is_fr) ? "{C}{c}%s de fichier Thomson incorrect"
+                                : "{C}{c}wrong Thomson file %s", name);
 }
 
 
@@ -119,8 +119,8 @@ static int error_wrong_thomson_file (char *name)
 static int error_missing_pc_quote (void)
 {
     return error_Error (
-            (is_fr) ? "{Cc}guillemet manquante pour nom de fichier PC"
-                    : "{Cc}missing quote for PC file name");
+            (is_fr) ? "{C}{c}guillemet manquante pour nom de fichier PC"
+                    : "{C}{c}missing quote for PC file name");
 }
 
 
@@ -130,8 +130,8 @@ static int error_missing_pc_quote (void)
  */
 static int error_missing_file_name (void)
 {
-    return error_Error ((is_fr) ? "{Cc}nom de fichier manquant"
-                                : "{Cc}missing file name");
+    return error_Error ((is_fr) ? "{C}{c}nom de fichier manquant"
+                                : "{C}{c}missing file name");
 }
 
 
@@ -141,8 +141,8 @@ static int error_missing_file_name (void)
  */
 static int error_include_conflict (char *name)
 {
-    return error_Fatal ((is_fr) ? "{Cc>%s}conflit d'include"
-                                : "{Cc>%s}include conflict", name);
+    return error_Fatal ((is_fr) ? "{C}{c}{>%s}conflit d'include"
+                                : "{C}{c}{>%s}include conflict", name);
 }
 
 
@@ -152,8 +152,8 @@ static int error_include_conflict (char *name)
  */
 static int error_duplicate_main (char *name)
 {
-    return error_Fatal ((is_fr) ? "{Cc>%s}main en double"
-                                : "{Cc>%s}duplicate main", name);
+    return error_Fatal ((is_fr) ? "{C}{c}{>%s}main en double"
+                                : "{C}{c}{>%s}duplicate main", name);
 }
 
 
@@ -163,8 +163,8 @@ static int error_duplicate_main (char *name)
  */
 static int error_duplicate_include (char *name)
 {
-    return error_Fatal ((is_fr) ? "{Cc>%s}include en double"
-                                : "{Cc>%s}duplicate include", name);
+    return error_Fatal ((is_fr) ? "{C}{c}{>%s}include en double"
+                                : "{C}{c}{>%s}duplicate include", name);
 }
 
 
@@ -281,6 +281,7 @@ static int get_pc_path (void)
 {
     int err = 0;
     char *quote;
+    char str[MAX_STRING];
 
     if (arg_ReadField (&pdesc, ARG_STYLE_VALUE) == ARG_END)
     {
@@ -289,14 +290,13 @@ static int get_pc_path (void)
     else
     if (*arg.str == '"')
     {
-        quote = strchr (arg.str+1, (int)'"');
+        (void)snprintf (str, MAX_STRING, "%s", arg.str+1);
+        quote = strchr (str, (int)'"');
         if (quote != NULL)
         {
-            if ((quote - arg.str) > 2)
-            {
-                strncpy (path_pc, arg.str+1, quote-arg.str-1);
-            }
-            else
+            quote[0] = '\0';
+            (void)snprintf (path_pc, MAX_STRING, "%s", str);
+            if (strlen (str) < 1)
             {
                 err = error_missing_file_name ();
             }
@@ -835,8 +835,8 @@ struct SOURCE_LIST *source_Includ (void)
     if (source == NULL)
     {
         (void)error_Error ((is_fr)
-            ? "{Cc>%s}fichier ou répertoire introuvable"
-            : "{Cc>%s}no such file or directory",
+            ? "{C}{c}{>%s}fichier ou répertoire introuvable"
+            : "{C}{c}{>%s}no such file or directory",
              (path_thomson[0] != '\0') ? path_thomson : path_pc);
     }
 

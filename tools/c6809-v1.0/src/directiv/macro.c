@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
 #define MACROCALL_MAX   10
 
 struct MACRO_LIST {
-     int   id;
+     u16   id;
 	 int   quiet; /* sam */
 	 int   expanded_label;
      int   start;
@@ -65,7 +65,7 @@ struct MACROCALL_LIST {
 static struct MACRO_LIST /*@only@*//*@null@*/*macro_list = NULL;
 static struct MACROCALL_LIST /*@only@*//*@null@*/*macrocall_list = NULL;
 static int macrocall_level = 0;
-static int macro_id = 0;
+static u16 macro_id = 0;
 static int macro_line = 0;
 static int macro_quiet = 0;
 
@@ -75,7 +75,7 @@ static int macro_quiet = 0;
  *  Renvoie le pointeur sur la MACRO.
  */
 struct MACRO_LIST /*@dependent@*//*@null@*/
-    *get_pointer (struct MACRO_LIST /*@null@*/*list, int value)
+    *get_pointer (struct MACRO_LIST /*@null@*/*list, u16 value)
 {
     struct MACRO_LIST /*@dependent@*//*@null@*/*found = NULL;
 
@@ -199,8 +199,8 @@ static void add_macro_call_arg_list (struct MACROCALL_LIST *macrocall)
         }
         else
         {
-            err = error_Error ((is_fr) ?"{Cc}trop d'arguments (max %d)"
-                                       :"{Cc}too many arguments (max %d)",
+            err = error_Error ((is_fr) ?"{C}{c}trop d'arguments (max %d)"
+                                       :"{C}{c}too many arguments (max %d)",
                                         MACROCALL_MAX);
         }
 
@@ -286,8 +286,8 @@ static char /*@dependent@*//*@null@*/*get_macro_arg_string (int i)
             err = (macro_arg_string[0] != '\\') ? 1 : 
                   ((i = (int)(macro_arg_string[1]-'0')&0xff) > 9) ?
                      error_Error ((is_fr)
-                        ? "{+@%s}chiffre incorrect"
-                        : "{+@%s}wrong decimal digit",
+                        ? "{+}{@%s}chiffre incorrect"
+                        : "{+}{@%s}wrong decimal digit",
                          arg_FilteredChar (macro_arg_string[1])) : err;
         }
         else
@@ -313,14 +313,14 @@ static void add_macro_call_entry (struct SYMBOL_LIST *symbol)
     if ((macrocall_level == 8)
      && (assemble.soft == ASSEMBLER_MACRO))
     {
-        error_Assembler ((is_fr)?"{Cc}8 appels récursifs maximum"
-                                :"{Cc}8 recursive calls maximum");
+        error_Assembler ((is_fr)?"{C}{c}8 appels récursifs maximum"
+                                :"{C}{c}8 recursive calls maximum");
     }
 
     if (macrocall_level == 500)
     {
-        (void)error_Fatal ((is_fr)?"{Cc}trop d'appels récursifs (max 500)"
-                                  :"{Cc}too many recursive calls (max 500)");
+        (void)error_Fatal ((is_fr)?"{C}{c}trop d'appels récursifs (max 500)"
+                                  :"{C}{c}too many recursive calls (max 500)");
     }
     else
     {
@@ -344,8 +344,8 @@ static void add_macro_call_entry (struct SYMBOL_LIST *symbol)
             }
             else
             {
-                (void)error_Error ((is_fr)?"{Cc}macro non trouvée"
-                                          :"{Cc}macro not found");
+                (void)error_Error ((is_fr)?"{C}{c}macro non trouvée"
+                                          :"{C}{c}macro not found");
             }
         }
     }
@@ -378,8 +378,8 @@ void macro_AssembleMACRO (void)
 
     if (assemble.label[0] == '\0')
     {
-        (void)error_Error ((is_fr)?"{Cc}étiquette obligatoire"
-                                  :"{Cc}label required");
+        (void)error_Error ((is_fr)?"{C}{c}étiquette obligatoire"
+                                  :"{C}{c}label required");
     }
     else
     {
@@ -393,8 +393,8 @@ void macro_AssembleMACRO (void)
             else
             if (*arg.str != '*')
             {
-                (void)error_Error ((is_fr)?"{Cc}option incorrecte"
-                                          :"{Cc}wrong option");
+                (void)error_Error ((is_fr)?"{C}{c}option incorrecte"
+                                          :"{C}{c}wrong option");
             }
         }
 
@@ -408,15 +408,15 @@ void macro_AssembleMACRO (void)
             if ((if_GetLevel() > 1)
              && (assemble.soft == ASSEMBLER_MACRO))
             {
-                error_Assembler ((is_fr)?"{Cc}non supporté dans un IF"
-                                        :"{Cc}not supported inside IF");
+                error_Assembler ((is_fr)?"{C}{c}non supporté dans un IF"
+                                        :"{C}{c}not supported inside IF");
             }
 
             if ((macrocall_level > 0)
              || ((assemble.lock & ASSEMBLE_LOCK_MACRO) != 0))
             {
-                (void)error_Error ((is_fr)?"{Cc}imbrication non supportée"
-                                          :"{Cc}embedding not supported");
+                (void)error_Error ((is_fr)?"{C}{c}imbrication non supportée"
+                                          :"{C}{c}embedding not supported");
             }
             else
             {
@@ -466,7 +466,8 @@ void macro_AssembleENDM (void)
 
     if (err != 0)
     {
-        (void)error_Error ((is_fr)?"{Cc}MACRO manquant" :"{Cc}missing MACRO");
+        (void)error_Error ((is_fr)?"{C}{c}MACRO manquant" 
+                                  :"{C}{c}missing MACRO");
     }
 
     error_LabelNotSupported ();
@@ -534,8 +535,8 @@ void macro_Call (void)
 
     if (assemble.soft < ASSEMBLER_MACRO)
     {
-        error_Assembler ((is_fr)?"{Cc}appel de macro non supporté"
-                                :"{Cc}macro call not supported");
+        error_Assembler ((is_fr)?"{C}{c}appel de macro non supporté"
+                                :"{C}{c}macro call not supported");
     }
 
     error_LabelNotSupported ();
@@ -548,8 +549,8 @@ void macro_Call (void)
         {
             if (symbol->prm->error == SYMBOL_ERROR_MULTIPLY_DEFINED)
             {
-                (void)error_Error ((is_fr)?"{Cc}symbole déjà utilisé"
-                                          :"{Cc}symbol already used");
+                (void)error_Error ((is_fr)?"{C}{c}symbole déjà utilisé"
+                                          :"{C}{c}symbol already used");
             }
             else
             {
@@ -559,8 +560,8 @@ void macro_Call (void)
         }
         else
         {
-            (void)error_Error ((is_fr)?"{Cc}macro non définie"
-                                      :"{Cc}undefined macro");
+            (void)error_Error ((is_fr)?"{C}{c}macro non définie"
+                                      :"{C}{c}undefined macro");
         }
     }
 

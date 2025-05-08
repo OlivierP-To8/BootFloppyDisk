@@ -211,7 +211,7 @@ Les bases numériques :
 Ascii           |    '              |    '              |    '              |
 Binaire         |    %        U     |    %              |    %       U      |
 Octal           |    @       Q O    |    @              |    @      Q O     |
-Décimal         |    &        T     |    &              |    &       T      |
+Décimal         |    &       T D    |    &              |    &      T D     |
 Hexadécimal     |   $ 0       H     |   $ 0             |   $ 0      H      |
 ----------------+-------------------+-------------------+-------------------+
 

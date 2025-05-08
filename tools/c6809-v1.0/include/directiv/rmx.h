@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 
 extern void  rmx_AssembleRMB (void);
 extern void  rmx_AssembleRMD (void);
-extern int   rmx_GetSize (void);
-extern void  rmx_SetSize (int size);
+extern u16   rmx_GetSize (void);
+extern void  rmx_SetSize (u16 size);
 
 #endif
 

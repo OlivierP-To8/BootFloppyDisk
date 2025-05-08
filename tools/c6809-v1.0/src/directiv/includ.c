@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -122,8 +122,8 @@ static void check_include (void)
     {
         if (include_level > 1)
         {
-            error_Assembler ((is_fr)?"{Cc}appel dans un INCLUD non supporté"
-                                    :"{Cc}call from an INCLUD not supported");
+            error_Assembler ((is_fr)?"{C}{c}appel dans un INCLUD non supporté"
+                                    :"{C}{c}call from an INCLUD not supported");
         }
     }
     else
@@ -132,21 +132,21 @@ static void check_include (void)
         if ((assemble.lock & ASSEMBLE_LOCK_MACRO) != 0)
         {
             error_Assembler (
-                    (is_fr)?"{Cc}appel dans une MACRO non supporté"
-                           :"{Cc}call from a MACRO not supported");
+                    (is_fr)?"{C}{c}appel dans une MACRO non supporté"
+                           :"{C}{c}call from a MACRO not supported");
         }
         else
         if (include_level > 8)
         {
-            error_Assembler ((is_fr)?"{Cc}8 imbrications maximum"
-                                    :"{Cc}8 embeddings maximum");
+            error_Assembler ((is_fr)?"{C}{c}8 imbrications maximum"
+                                    :"{C}{c}8 embeddings maximum");
         }
     }
 
     if (include_level >= 150)
     {
-        (void)error_Fatal ((is_fr)?"{Cc}trop d'imbrications (max 150)"
-                                  :"{Cc}too many embeddings (max 150)");
+        (void)error_Fatal ((is_fr)?"{C}{c}trop d'imbrications (max 150)"
+                                  :"{C}{c}too many embeddings (max 150)");
     }
 }
 

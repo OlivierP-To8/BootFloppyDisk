@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ static void p_echo (const char *format, ... )
 /* binary_number:
  *  Renvoie un nombre en base binaire.
  */
-static char /*@dependent@*/*binary_number (int val)
+static char /*@dependent@*/*binary_number (u16 val)
 {
     int i;
     int digit = 0;
@@ -63,7 +63,7 @@ static char /*@dependent@*/*binary_number (int val)
     str[0] = '\0';
     for (i = 15; i >= 0; i--)
     {
-        if ((digit = (int)((digit * 2) | (((uint)val >> (uint)i) & 1))) != 0)
+        if ((digit = (int)((digit * 2) | ((val >> (uint)i) & 1))) != 0)
         {
             strcat (str, ((digit & 1) == 0) ? "0" : "1");
         }
@@ -79,7 +79,7 @@ static char /*@dependent@*/*binary_number (int val)
 static void create_echo_string (void)
 {
     char c;
-    int value = 0;
+    u16 value = 0;
 
     echo_string[0] = '\0';
     echo_string_length = 0;
@@ -94,9 +94,9 @@ static void create_echo_string (void)
 
             switch (c)
             {
-                case '@': p_echo ("@%o", (int)value&0xffff); break;
-                case '&': p_echo ("%d", (int)value&0xffff); break;
-                case '$': p_echo ("$%04X", (int)value&0xffff); break;
+                case '@': p_echo ("@%o", value); break;
+                case '&': p_echo ("%d", value); break;
+                case '$': p_echo ("$%04X", value); break;
                 case '%': p_echo ("%%%s", binary_number (value)); break;
             }
         }

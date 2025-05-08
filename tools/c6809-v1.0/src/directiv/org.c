@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "symbol.h"
 #include "directiv/org.h"
 
-static int org_pc = 0;
+static u16 org_pc = 0;
 
 
 /* ------------------------------------------------------------------------- */
@@ -52,7 +52,7 @@ void org_AssembleORG (void)
 /* org_Set:
  *  Définit la valeur de ORG.
  */
-void org_Set (int org)
+void org_Set (u16 org)
 {
     org_pc = org;
 }
@@ -62,7 +62,7 @@ void org_Set (int org)
 /* org_Get:
  *  Retourne la valeur de ORG.
  */
-int org_Get (void)
+u16 org_Get (void)
 {
     return org_pc;
 }

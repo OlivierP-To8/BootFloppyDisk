@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
  */
 static void assemble_call_and_goto (char b7)
 {
-    int value = 0;
+    u16 value = 0;
 
     output_SetCode (OUTPUT_CODE_2_FOR_2);
     (void)eval_Do (&assemble.ptr, &value);

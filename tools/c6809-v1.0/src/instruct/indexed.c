@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -70,12 +70,12 @@ static int immediate_size[16] = {
 /* optimize_can_be_direct_mode:
  *  Helper pour erreur.
  */
-static void optimize_can_be_direct_mode (int value)
+static void optimize_can_be_direct_mode (u16 value)
 {
     if ((value&0xff00) == (setdp_Get()*256))
     {
-        error_Optimize ((is_fr)?"{a}mode direct possible (DP=$%02X)"
-                               :"{a}could be direct mode (DP=$%02X)",
+        error_Optimize ((is_fr)?"{a}{f}mode direct possible (DP=$%02X)"
+                               :"{a}{f}could be direct mode (DP=$%02X)",
                                 setdp_Get());
     }
 }
@@ -85,12 +85,12 @@ static void optimize_can_be_direct_mode (int value)
 /* error_8_bits_out_of_range:
  *  Helper pour erreur.
  */
-static void error_8_bits_out_of_range (int value)
+static void error_8_bits_out_of_range (u16 value)
 {
-    if ((value < -128) || (value > 127))
+    if ((value > 0x7f) && (value < 0xff80))
     {
-        (void)error_Error ((is_fr)?"{o}offset hors champ"
-                                  :"{o}offset out of range");
+        (void)error_Error ((is_fr)?"{a}{f}offset hors champ"
+                                  :"{a}{f}offset out of range");
     }
 }
 
@@ -99,12 +99,12 @@ static void error_8_bits_out_of_range (int value)
 /* optimize_can_be_8_bits:
  *  Helper pour erreur.
  */
-static void optimize_can_be_8_bits (int value)
+static void optimize_can_be_8_bits (u16 value)
 {
-    if ((value >= -128) && (value <= 127))
+    if ((value >= 0xff80) || (value <= 127))
     {
-        error_Optimize ((is_fr) ? "{a}offset 8 bits possible"
-                                : "{a}could be 8 bits offset");
+        error_Optimize ((is_fr) ? "{a}{f}offset 8 bits possible"
+                                : "{a}{f}could be 8 bits offset");
     }
 }
 
@@ -136,14 +136,15 @@ static void set_register_code (int rcode)
 /* indexed_with_offset_and_pcr:
  *  Assemble un adressage indexé avec offset et PCR.
  */
-static void indexed_with_offset_and_pcr (int value, int mode)
+static void indexed_with_offset_and_pcr (u16 value, int mode)
 {
     int size;
 
     value -= org_Get() + 3 + ((bin.buf[0] == '\0') ? 0 : 1);
+    
     size = (((symbol_Undefined () == 0)
          && ((mode & BIT_EXTENDED) == 0)
-         && (value >= -128) && (value <= 127))
+         && ((value >= 0xff80) || (value <= 0x7f)))
          || ((mode & BIT_DIRECT) != 0)) ? SIZE_8_BITS : SIZE_16_BITS;
 
     switch (size)
@@ -158,11 +159,11 @@ static void indexed_with_offset_and_pcr (int value, int mode)
 
         case SIZE_16_BITS :
             optimize_can_be_8_bits (value);
-            value--;
+            value -= 1;
             output_SetCode (OUTPUT_CODE_3_FOR_4);
             mark_AddPlus (5);
             bin.buf[2] = '\x8d';
-            bin.buf[3] = (char)((value&0xff00)/256);
+            bin.buf[3] = (char)(value/256);
             bin.buf[4] = (char)value;
             break;
     }
@@ -191,8 +192,8 @@ static void indexed_with_plus (int mode)
         else
         if ((mode & BIT_INDIRECT) != 0)
         {
-            (void)error_Error ((is_fr) ? "{[a+}mode d'adressage incorrect"
-                                       : "{[a+}bad addressing mode");
+            (void)error_Error ((is_fr) ? "{[}{a}{+}mode d'adressage incorrect"
+                                       : "{[}{a}{+}bad addressing mode");
         }
     }
 }
@@ -217,8 +218,8 @@ static void indexed_with_minus (int *rcode, int mode)
     else
     if ((mode & BIT_INDIRECT) != 0)
     {
-        (void)error_Error ((is_fr) ? "{[a+}mode d'adressage incorrect"
-                                   : "{[a+}bad addressing mode");
+        (void)error_Error ((is_fr) ? "{[}{a}{+}mode d'adressage incorrect"
+                                   : "{[}{a}{+}bad addressing mode");
     }
 
 
@@ -324,7 +325,7 @@ static void indexed_with_register (int mode)
  */
 static void immediate (int mode)
 {
-    int value = 0;
+    u16 value = 0;
 
     mark_AddCycle (-2);
 
@@ -340,7 +341,7 @@ static void immediate (int mode)
         case SIZE_8_BITS :
             output_SetCode (OUTPUT_CODE_2_FOR_2);
             bin.buf[2] = (char)value;
-            if ((value < -256) || (value > 255))
+            if ((value < 0xff00) && (value > 0xff))
             {
                 (void)error_OperandOutOfRange ();
             }
@@ -348,7 +349,7 @@ static void immediate (int mode)
 
         case SIZE_16_BITS :
             output_SetCode (OUTPUT_CODE_2_FOR_3);
-            bin.buf[2] = (char)((value&0xff00)/256);
+            bin.buf[2] = (char)(value/256);
             bin.buf[3] = (char)value;
             break;
 
@@ -361,12 +362,12 @@ static void immediate (int mode)
 /* indexed_with_offset_and_register:
  *  Assemble un adressage indexé avec offset et registre.
  */
-static void indexed_with_offset_and_register (int value, int mode, int rcode)
+static void indexed_with_offset_and_register (u16 value, int mode, int rcode)
 {
     int size = ((symbol_Undefined () == 0) && ((mode & BIT_EXTENDED) == 0))
            ? (((mode & BIT_INDIRECT) == 0)
-             && (value >= -16) && (value <= 15)) ? SIZE_5_BITS :
-             ((value >= -128) && (value <= 127)) ? SIZE_8_BITS : SIZE_16_BITS
+             && ((value >= 0xfff0) || (value <= 0x0f))) ? SIZE_5_BITS :
+             ((value >= 0xff80) || (value <= 0x7f)) ? SIZE_8_BITS : SIZE_16_BITS
            : ((mode & BIT_DIRECT) != 0) ? SIZE_8_BITS : SIZE_16_BITS;
 
     switch (size)
@@ -389,7 +390,7 @@ static void indexed_with_offset_and_register (int value, int mode, int rcode)
             output_SetCode (OUTPUT_CODE_3_FOR_4);
             mark_AddPlus (4);
             bin.buf[2] = '\x89';
-            bin.buf[3] = (char)((value&0xff00)/256);
+            bin.buf[3] = (char)(value/256);
             bin.buf[4] = (char)value;
             break;
     }
@@ -398,16 +399,16 @@ static void indexed_with_offset_and_register (int value, int mode, int rcode)
      && (size > SIZE_0_BIT)
      && ((mode & BIT_INDIRECT) == 0))
     {
-        error_Optimize ((is_fr) ? "{a}offset 0 bit possible"
-                                : "{a}could be 0 bit offset");
+        error_Optimize ((is_fr) ? "{a}{f}offset 0 bit possible"
+                                : "{a}{f}could be 0 bit offset");
     }
     else
-    if ((value >= -16) && (value <= 15)
+    if (((value >= 0xfff0) || (value <= 0x0f))
      && (size > SIZE_5_BITS)
      && ((mode & BIT_INDIRECT) == 0))
     {
-        error_Optimize ((is_fr) ? "{a}offset 5 bits possible"
-                                : "{a}could be 5 bits offset");
+        error_Optimize ((is_fr) ? "{a}{f}offset 5 bits possible"
+                                : "{a}{f}could be 5 bits offset");
     }
     else
     if (size > SIZE_8_BITS)
@@ -423,7 +424,7 @@ static void indexed_with_offset_and_register (int value, int mode, int rcode)
 /* direct_or_extended:
  *  Assemble un adressage direct ou étendu.
  */
-static void direct_or_extended (int value, int mode)
+static void direct_or_extended (u16 value, int mode)
 {
     int size = (((symbol_Undefined () == 0)
              && ((mode & BIT_INDIRECT) == 0)
@@ -452,7 +453,7 @@ static void direct_or_extended (int value, int mode)
                 mark_AddCycle (1);
                 output_SetCode (OUTPUT_CODE_2_FOR_3);
                 bin.buf[1] |= ((mode & BIT_IMMEDIATE) != 0) ? '\x30' : '\x70';
-                bin.buf[2] = (char)((value&0xff00)/256);
+                bin.buf[2] = (char)(value/256);
                 bin.buf[3] = (char)value;
                 optimize_can_be_direct_mode (value);
             }
@@ -462,7 +463,7 @@ static void direct_or_extended (int value, int mode)
                 adjust_post_code (mode);
                 mark_AddPlus (2);
                 bin.buf[2] = '\x9f';
-                bin.buf[3] = (char)((value&0xff00)/256);
+                bin.buf[3] = (char)(value/256);
                 bin.buf[4] = (char)value;
             }
             break;
@@ -480,7 +481,7 @@ static void direct_or_extended (int value, int mode)
 /* with_offset_and_register:
  *  Assemble un adressage avec offset et registre.
  */
-static void with_offset_and_register (int value, int mode)
+static void with_offset_and_register (u16 value, int mode)
 {
     int rcode;
 
@@ -508,7 +509,7 @@ static void with_offset_and_register (int value, int mode)
  */
 static void with_offset (int mode)
 {
-    int value = 0;
+    u16 value = 0;
 
     (void)eval_Do (&assemble.ptr, &value);
     switch (*assemble.ptr)

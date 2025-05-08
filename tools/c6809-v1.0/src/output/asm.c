@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -74,26 +74,22 @@ static void write_char (char c, FILE *file)
 static void write_line (char *p, FILE *file)
 {
     int i;
-    char *c;
-    int space_count = 0;
+    char *str;
+    int spc = 0;
 
     if (asm_lock == 0)
     {
         for (i = 0; ((*p != '\0') && (i < MAX_ARG)); i++)
         {
-            c = encode_GetCharToAsm (asm_encoding, &p);
-            switch (*c)
+            str = encode_GetCharToAsm (asm_encoding, &p);
+            switch (*str)
             {
-                case ' ':
-                    space_count += 1;
+                case ' ' :
+                    spc += 1;
                     break;
 
                 case '\t':
-                    space_count =
-                        (space_count < 7) ? 7 :
-                        (space_count < 14) ? 14 :
-                        (space_count < 22) ? 22 :
-                        ((space_count - 22) & ~7) + 8 + 22;
+                    spc = (spc<7) ? 7 : (spc<14) ? 14 : (spc<22) ? 22 : spc+1;
                     break;
 
                 default:
@@ -102,15 +98,13 @@ static void write_line (char *p, FILE *file)
                         write_char ('\xd', file);
                         asm_total_size += 2;
                     }
-
-                    while (space_count > 0)
+                    while (spc > 0)
                     {
-                        write_char ((char)(0xf0 | MIN(space_count, 15)), file);
+                        write_char ((char)(0xf0 | MIN(spc, 15)), file);
                         asm_total_size += 1;
-                        space_count -= MIN(space_count, 15);
+                        spc -= MIN(spc, 15);
                     }
-
-                    write_char (*c, file);
+                    write_char (*str, file);
                     asm_total_size += 1;
                     break;
             }
@@ -289,14 +283,16 @@ static void create_asm_files (char *file_name)
     char save_name[MAX_STRING+8+1];
     char save_dir[MAX_STRING+1];
 
-    save_dir[0] = '\0';
-    strcpy (save_dir, file_name);
-    if (((p = strrchr (save_dir, '/')) == NULL)
-     && ((p = strrchr (save_dir, '\\')) == NULL))
+    (void)snprintf (save_dir, MAX_STRING, "%s", file_name);
+    if (((p = strrchr (save_dir, '/')) != NULL)
+     || ((p = strrchr (save_dir, '\\')) != NULL))
     {
-        p = save_dir;
+        p[0] = '\0';
     }
-    p[0] = '\0';
+    else
+    {
+        (void)snprintf (save_dir, MAX_STRING, "%s", ".");
+    }
 
     con_SetWriteDoor (CONSOLE_WRITE_DOOR_OPENED);
     message_create_start ();

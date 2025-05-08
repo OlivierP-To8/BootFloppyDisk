@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef C6809_EVAL_H
 #define C6809_EVAL_H 1
 
-extern int   eval_Do (char **p, int *value);
+extern int   eval_Do (char **p, u16 *value);
 extern void  eval_SetSoftOperator (void);
 extern void  eval_SetC6809Operator (void);
 

@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 #define C6809_ORG_H 1
 
 extern void  org_AssembleORG (void);
-extern void  org_Set (int org);
-extern int   org_Get (void);
+extern void  org_Set (u16 org);
+extern u16   org_Get (void);
 
 #endif
 

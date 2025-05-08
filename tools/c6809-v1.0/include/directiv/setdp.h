@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef C6809_SETDP_H
 #define C6809_SETDP_H 1
 
-extern int   setdp_Get (void);
-extern void  setdp_Set (int value);
+extern u16   setdp_Get (void);
+extern void  setdp_Set (u16 value);
 extern void  setdp_AssembleSETDP (void);
 
 #endif

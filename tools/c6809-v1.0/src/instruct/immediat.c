@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,31 +39,38 @@
 void immediat_Assemble (void)
 {
     int err = 0;
-    int value = 0;
+    u16 value = 0;
 
     output_SetCode (OUTPUT_CODE_2_FOR_2);
 
-    if (arg_Read (&assemble.ptr, ARG_STYLE_ADDRESSING) == ARG_SIGN)
+    switch (arg_Read (&assemble.ptr, ARG_STYLE_ADDRESSING))
     {
-        if (*arg.str == '#')
-        {
-            err = eval_Do (&assemble.ptr, &value);
-            if ((value < -256) || (value > 255))
+        case ARG_SIGN:
+            if (*arg.str == '#')
             {
-                err = error_Error ((is_fr)?"{o}valeur 8 bits attendue"
-                                          :"{o}8 bits value expected");
+                err = eval_Do (&assemble.ptr, &value);
+                if ((value > 0xff) && (value < 0xff00))
+                {
+                    err = error_Error ((is_fr)?"{o}valeur 8 bits attendue"
+                                              :"{o}8 bits value expected");
+                }
             }
-        }
-        else
-        {
+            else
+            {
+                err = error_Error ((is_fr)?"{+}préfixe '#' attendu"
+                                          :"{+}prefix '#' expected");
+            }
+            break;
+
+        case ARG_END:
+            err = error_Error ((is_fr)?"{-}préfixe '#' attendu"
+                                      :"{-}expect '#' prefix");
+            break;
+
+        default:
             err = error_Error ((is_fr)?"{+}préfixe '#' attendu"
-                                      :"{+}prefix '#' expected");
-        }
-    }
-    else
-    {
-        err = error_Error ((is_fr)?"{-}préfixe '#' attendu"
-                                  :"{-}expect '#' prefix");
+                                      :"{+}expect '#' prefix");
+            break;
     }
 
     bin.buf[2] = (err == 0) ? (char)value : '\0';

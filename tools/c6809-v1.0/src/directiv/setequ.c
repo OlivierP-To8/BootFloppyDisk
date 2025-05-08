@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #include "symbol.h"
 #include "directiv/setequ.h"
 
-static int setequ_value = 0;
+static u16 setequ_value = 0;
 
 
 
@@ -45,8 +45,8 @@ static void assemble_setequ (int type)
 
     if (assemble.label[0] == '\0')
     {
-        (void)error_Error ((is_fr)?"{Cc}étiquette obligatoire"
-                                  :"{Cc}label required");
+        (void)error_Error ((is_fr)?"{C}{c}étiquette obligatoire"
+                                  :"{C}{c}label required");
     }
     else
     {
@@ -66,7 +66,7 @@ static void assemble_setequ (int type)
 /* setequ_Set:
  *  Initialise la valeur du SET/EQU.
  */
-void setequ_Set (int value)
+void setequ_Set (u16 value)
 {
     setequ_value = value;
 }
@@ -76,7 +76,7 @@ void setequ_Set (int value)
 /* setequ_Get:
  *  Retourne la valeur du SET/EQU.
  */
-int setequ_Get (void)
+u16 setequ_Get (void)
 {
     return setequ_value;
 }

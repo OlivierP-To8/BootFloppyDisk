@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ static void write_open_hunk (int flag, int addr)
         wbin_fputc (addr&0xff);
     }
 
-    wbin_addr = org_Get();
+    wbin_addr = (int)org_Get();
 }
 
 
@@ -366,7 +366,7 @@ void bin_Flush (void)
  */
 void bin_MoveOrg (void)
 {
-    org_Set (SIGNED (org_Get() + bin_flush_size + rmx_GetSize ()));
+    org_Set (org_Get() + (u16)bin_flush_size + rmx_GetSize ());
     mark_AddSize (bin_flush_size);
 }
 
@@ -397,7 +397,7 @@ void bin_WClose (void)
 
     if (wbin_type != BIN_TYPE_DATA)
     {
-        write_open_hunk (0xff, end_GetExec());
+        write_open_hunk (0xff, (int)end_GetExec());
     }
 
     if (wbin_file != NULL)

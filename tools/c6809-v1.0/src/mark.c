@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ static void info_mark (void)
  */
 static void check_mark_value (int check, int pos)
 {
-    int value = 0;
+    u16 value = 0;
     char argstr[MAX_STRING+1];
     char *p;
 
@@ -79,7 +79,7 @@ static void check_mark_value (int check, int pos)
 
         if ((eval_Do (&p, &value) == 0)
          && (value != 0)
-         && (value != check))
+         && (value != (u16)check))
         {
             output_SetStyle (ARG_STYLE_BOLD);
             (void)output_File ((pos == 0) ? "" : ",");

@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef C6809_SETEQU_H
 #define C6809_SETEQU_H 1
 
-extern void  setequ_Set (int value);
-extern int   setequ_Get (void);
+extern void  setequ_Set (u16 value);
+extern u16   setequ_Get (void);
 extern void  setequ_AssembleSET (void);
 extern void  setequ_AssembleEQU (void);
 

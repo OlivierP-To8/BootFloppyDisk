@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -765,7 +765,7 @@ void assemble_Flush (int style)
 /* assemble_Label:
  *  Enregistre l'étiquette.
  */
-void assemble_Label (int type, int value)
+void assemble_Label (int type, u16 value)
 {
     int i;
     int err = 0;
@@ -786,8 +786,8 @@ void assemble_Label (int type, int value)
             if ((assemble.soft < ASSEMBLER_MACRO)
               && (assemble.label[i] == '_'))
             {
-                error_Assembler ((is_fr) ? "{Ll}'_' non supporté"
-                                         : "{Ll}'_' not supported");
+                error_Assembler ((is_fr) ? "{L}{l}'_' non supporté"
+                                         : "{L}{l}'_' not supported");
                 err = -1;
             }
         }
@@ -796,8 +796,8 @@ void assemble_Label (int type, int value)
         if (i > max)
         {
             error_Assembler ((is_fr)
-                ? "{Ll}étiquette trop longue (%d car. max)"
-                : "{Ll}label too long (%d chars max)", max);
+                ? "{L}{l}étiquette trop longue (%d car. max)"
+                : "{L}{l}label too long (%d chars max)", max);
         }
 
         /* Erreur si nom réservé */
@@ -805,8 +805,8 @@ void assemble_Label (int type, int value)
          || (get_directive_code (assemble.label) >= 0)
          || (arg_GetRegisterCode (assemble.label) >= 0))
         {
-            (void)error_Error ((is_fr)?"{Ll}symbole réservé"
-                                      :"{Ll}reserved symbol");
+            (void)error_Error ((is_fr)?"{L}{l}symbole réservé"
+                                      :"{L}{l}reserved symbol");
         }
         else
         /* Etiquette correcte */
@@ -826,20 +826,20 @@ void assemble_Label (int type, int value)
                 {
                     case SYMBOL_ERROR_NOT_DEFINED:
                         (void)error_Error ((is_fr)
-                            ? "{Ll}symbole inconnu"
-                            : "{Ll}unknown symbol", assemble.label);
+                            ? "{L}{l}symbole inconnu"
+                            : "{L}{l}unknown symbol", assemble.label);
                         break;
 
                     case SYMBOL_ERROR_MULTIPLY_DEFINED:
                         (void)error_Error ((is_fr)
-                            ? "{Ll}définition multiple"
-                            : "{Ll}multiple definition", assemble.label);
+                            ? "{L}{l}définition multiple"
+                            : "{L}{l}multiple definition", assemble.label);
                         break;
 
                     case SYMBOL_ERROR_LONE:
                         error_Warning ((is_fr)
-                            ? "{Ll}symbole unique"
-                            : "{Ll}lone symbol", assemble.label);
+                            ? "{L}{l}symbole unique"
+                            : "{L}{l}lone symbol", assemble.label);
                         break;
                 }
             }

@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ enum {
 struct SYMBOL_PRM {
     char  /*@only@*//*@null@*/*name;
     int   line;
-    int   value;
+    u16   value;
     int   type;
     int   changed;
     int   quiet;
@@ -55,7 +55,7 @@ struct SYMBOL_LIST {
 };
 
 extern struct SYMBOL_LIST /*@dependent@*//*@null@*/*symbol_Do (
-                            char *name, int value, int type);
+                            char *name, u16 value, int type);
 extern int   symbol_Undefined (void);
 extern void  symbol_Clear (void);
 extern int   symbol_GetLine (int type, char *name);

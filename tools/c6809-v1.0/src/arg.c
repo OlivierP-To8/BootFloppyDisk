@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -482,7 +482,7 @@ int arg_OperandError (void)
 /* arg_SetCommandStyle:
  *  Définit un style et une valeur pour une commande.
  */
-void arg_SetCommandStyle (int style, int value)
+void arg_SetCommandStyle (int style, u16 value)
 {
     struct ARG_LIST *list;
 

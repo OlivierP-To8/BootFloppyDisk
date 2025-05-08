@@ -1,6 +1,6 @@
 /*
- *  c6809 version 1.0.0
- *  copyright (c) 2024 François Mouret
+ *  c6809 version 1.0.3
+ *  copyright (c) 2025 François Mouret
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "eval.h"
 #include "directiv/setdp.h"
 
-static int setdp_value = 0;
+static u16 setdp_value = 0;
 
 
 /* ------------------------------------------------------------------------- */
@@ -41,10 +41,10 @@ void setdp_AssembleSETDP (void)
 {
     error_LabelNotSupported ();
     (void)eval_Do (&assemble.ptr, &setdp_value);
-    if ((setdp_value < 0) || (setdp_value > 255))
+    if (setdp_value > 0xff)
     {
-        (void)error_Error ((is_fr)?"{Co}valeur hors champ"
-                                  :"{Co}value out of range");
+        (void)error_Error ((is_fr)?"{C}{o}valeur hors champ"
+                                  :"{C}{o}value out of range");
     }
     output_SetCode (OUTPUT_CODE_DP);
 }
@@ -54,7 +54,7 @@ void setdp_AssembleSETDP (void)
 /* setdp_Get:
  *  Retourne la valeur du DP courant.
  */
-int setdp_Get (void)
+u16 setdp_Get (void)
 {
     return setdp_value & 0xff;
 }
@@ -64,7 +64,7 @@ int setdp_Get (void)
 /* setdp_Set:
  *  Initialise la valeur du DP courant.
  */
-void setdp_Set (int value)
+void setdp_Set (u16 value)
 {
     setdp_value = value;
 }
