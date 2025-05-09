@@ -20,8 +20,8 @@ INTROMO.BIN: tools/c6809 IntroMO.asm
 DEMOMO.BIN: tools/c6809 DemoMO.asm
 	tools/c6809 -bl DemoMO.asm $@
 
-BootMO.fd: tools/fdfs BOOTMOTO.BIN INTROMO.BIN DEMOMO.BIN FIRE.BIN
-	tools/fdfs -addBL $@ BOOTMOTO.BIN INTROMO.BIN DEMOMO.BIN FIRE.BIN
+BootMO.fd: tools/fdfs BOOTMO.BIN INTROMO.BIN DEMOMO.BIN FIRE.BIN
+	tools/fdfs -addBL $@ BOOTMO.BIN INTROMO.BIN DEMOMO.BIN FIRE.BIN
 
 
 BOOTTO.BIN: tools/c6809 BootTO.asm
